@@ -1,0 +1,8 @@
+curl -i -X POST \
+   -H "Content-Type: application/json; indent=4" \
+   -d '{
+    "jsonrpc": "2.0",
+    "method": "auth.login",
+    "params": {"email": "demo@server99.cloud", "password": "1"},
+    "id": "1"
+}' http://localhost:5000/user
