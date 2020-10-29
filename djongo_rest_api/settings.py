@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-
+# import mongoengine
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -83,10 +83,12 @@ CORS_ORIGIN_WHITELIST = (
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# mongoengine.connect(db="tbl_student_account", host='mongodb://localhost/tbl_student_account')
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'tbl_student',
+        'NAME': 'tbl_student_profile',
         'HOST': '127.0.0.1',
         'PORT': 27017
     }
@@ -111,6 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'students.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

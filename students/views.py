@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.decorators import api_view
 from students.serializers import StudentSerializers
-from students.models import Student
+from students.models import Student, User
 
 
 # Create your views here.
@@ -13,7 +13,8 @@ from students.models import Student
 @api_view(['GET', 'POST', 'DELETE'])
 def list_students(request):
     if request.method == "GET":
-        list_student = Student.objects.all().order_by('id')[:28].reverse()
+        # find all student in collection and order_by id 
+        list_student = Student.objects.all().order_by('id')
         print("list student: \n {}".format(list_student))
         name = request.GET.get('name', None)
         if name is not None:
@@ -21,6 +22,7 @@ def list_students(request):
         student_serializers = StudentSerializers(list_student, many=True)
         # safe = False is for objects serializers
         return JsonResponse(student_serializers.data, safe=False)
+    # create student
     elif request.method == 'POST':
         student_data = JSONParser().parse(request)
         if student_data:
@@ -31,6 +33,7 @@ def list_students(request):
             student_serializer.save()
             return JsonResponse(student_serializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(student_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # if method is not ["GET", "POST"] => throw error 405 HTTP
     else:
         return JsonResponse({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -39,15 +42,19 @@ def list_students(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def profile(request, pk):
     try:
+        # get id student if not => response error 404 HTTP
         student = Student.objects.get(pk=pk)
     except Student.DoesNotExist:
         return JsonResponse({"message": "This student does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+    # get student by id
     if request.method == "GET":
         student_serializers = StudentSerializers(student)
         return JsonResponse(student_serializers.data)
+    # delete student by id
     elif request.method == "DELETE":
         student.delete()
         return JsonResponse({"message": "Delete student successfully!"}, status=status.HTTP_204_NO_CONTENT)
+    # edit student by id
     elif request.method == "PUT":
         student_data = JSONParser().parse(request)
         student_serializers = StudentSerializers(student, data=student_data)
@@ -62,13 +69,15 @@ def profile(request, pk):
 # get all student in class
 @api_view(["GET", "DELETE"])
 def all_list_students(request):
-    students = Student.objects.filter(id__gt=0)[:28]
+    # filter by id greater than 0
+    students = Student.objects.filter(id__gt=0)
     if request.method == "GET":
         if students is not None:
             print("lst students: \n {}".format(students))
         student_serializers = StudentSerializers(students, many=True)
         return JsonResponse(student_serializers.data, safe=False)
     elif request.method == "DELETE":
+        # find all students all delete all
         delete_all = Student.objects.all().delete()
         return JsonResponse({"message": "All {} students have been deleted".format(delete_all[0])})
     else:
