@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('email', 'password', 'code_student_validation')
+        fields = ('email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -26,4 +26,3 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         email = serializers.EmailField(required=True)
         password = serializers.CharField(required=True)
-        # code_student_validation = serializers.CharField(required=True)

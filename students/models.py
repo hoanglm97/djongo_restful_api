@@ -15,7 +15,7 @@ def random_string(str_len=10):
 class Student(models.Model):
     name = models.CharField(max_length=200)
     age = models.IntegerField(default=18)
-    student_code = models.CharField(max_length=100)
+    student_code = random.randint(100000, 1000000)
     student_grade = random_string(6)
     master_class = models.CharField(max_length=200)
     description = models.CharField(max_length=1000)
@@ -32,7 +32,7 @@ class User(AbstractUser):
     is_staff = None
     is_superuser = None
 
-    student_information = models.ForeignKey(Student, on_delete=models.CASCADE)
+    # student_information = models.ForeignKey(Student, on_delete=models.CASCADE)
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True)
     USERNAME_FIELD = 'email'
