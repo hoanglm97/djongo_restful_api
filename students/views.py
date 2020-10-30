@@ -10,7 +10,7 @@ from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -31,7 +31,7 @@ def register(request):
 
 # login via email and password
 @api_view(["POST"])
-def login_required(request):
+def login(request):
     # if request.method == 'POST':
         # user_data = JSONParser().parse(request)
     user = UserLoginSerializer(data=request.data)
