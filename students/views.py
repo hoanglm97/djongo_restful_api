@@ -25,43 +25,43 @@ def register(request):
             print("pwd: {}".format(user_serializer.validated_data['password']))
             user_serializer.save()
             return JsonResponse(user_serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)        
+        return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 # login via email and password
 @api_view(["POST"])
-def login(request):
-    if request.method == 'POST':
-        user_data = JSONParser().parse(request)
-        user_serializer = UserSerializer(data=user_data)
-        if user_serializer.is_valid():
-            print("user_serializer: {} \n pwd: {}".format(username=user_serializer.validated_data['email'],
-                password=user_serializer.validated_data['password']))
-            user = authenticate(
-                request, 
-                username=user_serializer.validated_data['email'],
-                password=user_serializer.validated_data['password']
-            )
-            print("user: {}".format(user))
-            if user:
-                refresh = TokenObtainPairSerializer.get_token(user)
-                data = {
-                    'refresh_token': str(refresh),
-                    'access_token': str(refresh.access_token)
-                }
-                return JsonResponse(data, status=status.HTTP_200_OK)
-            return JsonResponse({
-                'error_message': 'Email or password is incorrect!',
-                'error_code': 400
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+def login_required(request):
+    # if request.method == 'POST':
+        # user_data = JSONParser().parse(request)
+    user = UserLoginSerializer(data=request.data)
+    if user.is_valid():
+        print("something!")
+        user = authenticate(
+            request,
+            username=user.validated_data['email'],
+            password=user.validated_data['password']
+        )
+        print("user: {}".format(user))
+        if user:
+            refresh = TokenObtainPairSerializer.get_token(user)
+            data = {
+                'refresh_token': str(refresh),
+                'access_token': str(refresh.access_token)
+            }
+            return JsonResponse(data, status=status.HTTP_200_OK)
         return JsonResponse({
-            'error_messages': user_serializer.errors,
+            'error_message': 'Email or password is incorrect!',
             'error_code': 400
         }, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return JsonResponse({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    return JsonResponse({
+        'error_messages': user.errors,
+        'error_code': 400
+    }, status=status.HTTP_400_BAD_REQUEST)
+    # else:
+    #     return JsonResponse({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 # get, create and delete student
 @api_view(['GET', 'POST', 'DELETE'])
@@ -136,5 +136,3 @@ def all_list_students(request):
         return JsonResponse({"message": "All {} students have been deleted".format(delete_all[0])})
     else:
         return JsonResponse({"message": "Method not allowed"})
-
-
